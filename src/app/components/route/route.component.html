@@ -1,0 +1,46 @@
+<div>
+    <button (click)="onCalculatePathBtn()" mat-raised-button>Расчитать выбранные маршруты</button>
+  </div>
+  <div>
+    <button (click)="onCalculateVRPBtn()" mat-raised-button>Расчитать</button>
+  </div>     
+  <div>
+    <button (click)="onDistribute()" mat-raised-button>Распределить визиты</button>
+  </div>
+  <p></p>
+
+  <mat-accordion>            
+    <mat-expansion-panel *ngFor="let route of routes"> 
+      <mat-expansion-panel-header>
+        
+        <mat-panel-title>
+          <mat-checkbox 
+            (click)="$event.stopPropagation()" 
+            (change)="onRouteCheckboxChange($event, route.id)"
+            [ngStyle]="{'background-color': !isAllDayRoutesChecked(route) ? 'red' : 'white', 'border-radius': '15px', 'border-width': '1px', 'color': 'red'}"
+            class="custom-checkbox"></mat-checkbox
+            >
+          {{ route.routeName }}
+        </mat-panel-title>
+
+        <mat-panel-description>
+          {{ route.id }}
+        </mat-panel-description>
+
+      </mat-expansion-panel-header>
+      
+      <mat-list>
+        <mat-list-item *ngFor="let dayRoute of route.dayRoutes">
+          <mat-checkbox [labelPosition]="'before'" 
+                [checked]="dayRoute.isChecked" 
+                (change)="onDayCheckboxChange($event, route.id, dayRoute.id)"
+                [ngStyle]="{'background-color': !dayRoute.routeDescription ? 'red' : 'white', 'border-radius': '15px', 'border-width': '1px', 'color': 'red'}"
+                >
+          </mat-checkbox> 
+            неделя {{ dayRoute.week }}, день {{ dayRoute.dayInWeek }} 
+            <input type="color" [(ngModel)]="dayRoute.color" >
+        </mat-list-item>
+      </mat-list>
+      
+    </mat-expansion-panel>
+  </mat-accordion>

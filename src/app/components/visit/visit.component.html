@@ -1,0 +1,9 @@
+<ul>
+    <li *ngFor="let day of days">
+      <ul>
+        <li *ngFor="let visit of day.visits" [ngClass]="{'highlighted': visit === selectedVisit}">
+          {{ visit.id }}
+        </li>
+      </ul>
+    </li>
+  </ul>
