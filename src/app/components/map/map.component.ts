@@ -52,6 +52,8 @@ export class MapComponent implements AfterViewInit, MapComponentInterface {
   private circleSource: VectorSource = new VectorSource();
   private textLayer: VectorSource = new VectorSource();
 
+  private currantPoint!: Feature<Geometry>;
+
 
   private featureMap: Map<number, Feature> = new Map<number, Feature<MultiLineString>>();
   private circleMap: Map<number, Feature[]> = new Map<number, Feature[]>;
@@ -97,27 +99,41 @@ export class MapComponent implements AfterViewInit, MapComponentInterface {
     })
 
     this.routeEventService.cleanMapEvent.subscribe(() => {
-        console.log('hi!');
         this.clearMap();
-    });
+    })
+
+    this.routeEventService.selectedVisit().subscribe(visit => {
+      this.changePointFormToSelected(visit.id);
+    })
   }
 
 
   addMapListeners() {
-
+    
+    // При нажатии на точку вызывается эвент 
+    // Также меняется отображение точки на карте - меняется ее размер и контур
     this.map.on("click", (e) => {
       e.map.forEachFeatureAtPixel(e.pixel, (feature, layer) => {
-          if (feature && layer.getSource() == this.circleSource){
-            let visit = feature.get('visit') as Visit;
-            this.routeEventService.sendVisitFromMap(visit);
-          } 
-          else {
-          }
+        if (feature && layer.getSource() == this.circleSource){
+          let visit = feature.get('visit') as Visit;
+          this.changePointFormToSelected(visit.id);
+
+          this.routeEventService.sendVisit(visit);
+        } 
+        else {
+        }
       });
     });
 
     let choosenFeatureCircle: any = null;
+    const textFeature = new Feature ({
+      name: 'Clicked on feature' 
+    });
 
+    // Отображает информацию о точке при наведении на нее
+    // с помощью добавления текстовой feature 
+    // должен отображаться толко один текстовый блок единовременно
+    // TODO: исправить мерцания при наведении на несколько точек
     this.map.on("pointermove", (e) => {
       const pixel = this.map.getEventPixel(e.originalEvent);
       const hit = this.map.hasFeatureAtPixel(pixel); // Проверяем, есть ли объекты на данном пикселе
@@ -144,10 +160,7 @@ export class MapComponent implements AfterViewInit, MapComponentInterface {
              + ' адрес: ' + visit.customerWarehouse.address + ' \n' 
              + ' маршрут: ' + visit.routeId
 
-            const textFeature = new Feature ({
-              geometry: new Point(coordinates),
-              name: 'Clicked on feature' // Ваш текстовый контент
-            });
+            textFeature.setGeometry(new Point(coordinates));
 
             const textStyle = new Text({
               font: '20px Calibri,sans-serif',
@@ -248,6 +261,54 @@ export class MapComponent implements AfterViewInit, MapComponentInterface {
     this.circleMap.set(day.id, fetureArray);
   }
 
+  private changePointFormToDefault() {
+
+    let style = this.currantPoint.getStyle() as Style;
+    
+    if (!style)
+      return;
+
+    let currentImage = style.getImage() as CircleStyle;
+
+    if (!currentImage) 
+      return;
+
+    let radius = currentImage.getRadius();
+
+    
+    currentImage.setRadius(12);
+    currentImage.setStroke(new Stroke({ color: 'black', width: 2 }));
+    
+  }
+
+  changePointFormToSelected(visitId: number) {
+    let circle = this.circleSource.getFeatureById(visitId);
+
+    if (!circle)
+      return;
+
+    if (this.currantPoint)
+      this.changePointFormToDefault();
+    
+    this.currantPoint =  circle;
+
+    let style = circle.getStyle() as Style;
+    
+    if (!style)
+      return;
+
+    let currentImage = style.getImage() as CircleStyle;
+
+    if (!currentImage) 
+      return;
+    
+    currentImage.setRadius(20);
+    currentImage.setStroke(new Stroke({ color: 'white', width: 8 }));
+
+    // Без явного присвоения не работает
+    circle.setStyle(style);
+  }
+
   private addCircleToMap(visit:Visit, coordinates: [number, number], count: number, color: string): Feature {
     const pointGeometry = new Point(fromLonLat(coordinates)); 
 
@@ -265,15 +326,16 @@ export class MapComponent implements AfterViewInit, MapComponentInterface {
     const pointStyle = new Style({
       image: new CircleStyle({
         radius: 12,
-        fill: new Fill({ color: color }), // Цвет заливки
-        stroke: new Stroke({ color: 'black', width: 2 }) // Цвет и толщина обводки
+        fill: new Fill({ color: color }),
+        stroke: new Stroke({ color: 'black', width: 2 }) 
       }),
-      text: textStyle // Добавляем текстовый стиль к точке
+      text: textStyle,
     });
 
-    pointFeature.setStyle(pointStyle); // Устанавливаем стиль для точки
+    pointFeature.setStyle(pointStyle); 
 
     pointFeature.setProperties({'visit': visit});
+    pointFeature.setId(visit.id);
 
     this.circleSource.addFeature(pointFeature);
 

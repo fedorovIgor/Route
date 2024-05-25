@@ -59,4 +59,8 @@ export class VisitComponent implements OnInit, VisitComponentInterface{
     this.days.splice(index, 1);
   }
 
+  onVisit(visit: Visit) {
+    this.routeEventService.sendVisit(visit);
+  }
+
 }

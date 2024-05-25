@@ -16,6 +16,7 @@ export class RouteEventService {
 
   private visitSelectedOnMap = new Subject<Visit>();
 
+
   sendDayRouteForPrint(dayRoute: DayRoute) {
     this.dayRouteToPrind.next(dayRoute);
   }
@@ -28,7 +29,7 @@ export class RouteEventService {
     this.dayRouteIdToRemove.next(dayRoute);
   }
 
-  sendVisitFromMap(visit: Visit) {
+  sendVisit(visit: Visit) {
     this.visitSelectedOnMap.next(visit);
   }
 
@@ -43,4 +44,5 @@ export class RouteEventService {
   selectedVisit() {
     return this.visitSelectedOnMap.asObservable();
   }
+
 }
