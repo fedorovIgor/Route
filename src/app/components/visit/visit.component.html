@@ -1,11 +1,38 @@
 <ul>
     <li *ngFor="let day of days">
       <ul>
-        <li *ngFor="let visit of day.visits" 
+        <!-- <li *ngFor="let visit of day.visits" 
         [ngClass]="{'highlighted': visit === selectedVisit}"
         (click)="onVisit(visit)" >
           {{ visit.id }}
-        </li>
+        </li> -->
+        <div>
+          <mat-table #table [dataSource]="day.visits">
+        
+            <!-- Id Column -->
+            <ng-container matColumnDef="id">
+              <mat-header-cell *matHeaderCellDef> id </mat-header-cell>
+              <mat-cell *matCellDef="let element"> {{element.id}} </mat-cell>
+            </ng-container>
+
+            <!-- Id Column -->
+            <ng-container matColumnDef="position">
+              <mat-header-cell *matHeaderCellDef> позиция </mat-header-cell>
+              <mat-cell *matCellDef="let element"> {{element.position}} </mat-cell>
+            </ng-container>
+
+            <!-- Id Column -->
+            <ng-container matColumnDef="distanceToNext">
+              <mat-header-cell *matHeaderCellDef> дистанция до следующей точки </mat-header-cell>
+              <mat-cell *matCellDef="let element"> {{element.distanceToNext}} </mat-cell>
+            </ng-container>
+        
+            <mat-header-row *matHeaderRowDef="columnsToDisplay"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: columnsToDisplay;"
+                      [ngClass]="{'highlighted-row': row.highlighted}"
+                      (click)="onVisit(row)"></mat-row>
+          </mat-table>
+        </div>
       </ul>
     </li>
   </ul>

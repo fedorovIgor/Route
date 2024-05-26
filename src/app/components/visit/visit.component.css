@@ -1,3 +1,4 @@
-.highlighted {
-    border: 2px solid red;
+
+  .highlighted-row {
+    background-color: yellow; /* Цвет выделения */
   }

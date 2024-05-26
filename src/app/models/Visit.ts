@@ -14,4 +14,5 @@ import { CustomerWarehouse } from "./CustomerWarehouse";
 
     customerWarehouse: CustomerWarehouse;
     routeId: number;
+    highlighted: boolean;
 }

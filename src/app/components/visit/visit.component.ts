@@ -4,18 +4,22 @@ import { DayRoute } from '../../models/DayRoutes';
 import { RouteEventService } from '../../services/route-event.service';
 import { CommonModule } from '@angular/common';
 import { Visit } from '../../models/Visit';
+import {MatTableModule} from '@angular/material/table';
 
 @Component({
   selector: 'app-visit',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule,
+    MatTableModule
+  ],
   templateUrl: './visit.component.html',
   styleUrl: './visit.component.css'
 })
 export class VisitComponent implements OnInit, VisitComponentInterface{
 
   days: DayRoute[] = [];
-  selectedVisit!: Visit;
+
+  columnsToDisplay = ['id', 'position', 'distanceToNext'];
 
   constructor(private routeEventService: RouteEventService) {}
 
@@ -33,7 +37,7 @@ export class VisitComponent implements OnInit, VisitComponentInterface{
     })
 
     this.routeEventService.selectedVisit().subscribe(visit => {
-      this.selectedVisit = visit;
+      this.onVisit(visit);
     })
 
     this.routeEventService.cleanMapEvent.subscribe(() => {
@@ -60,7 +64,9 @@ export class VisitComponent implements OnInit, VisitComponentInterface{
   }
 
   onVisit(visit: Visit) {
+    this.days.forEach(d => d.visits.forEach(v => v.highlighted = false))
     this.routeEventService.sendVisit(visit);
+    visit.highlighted = true;
   }
 
 }
