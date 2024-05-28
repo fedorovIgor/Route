@@ -145,8 +145,8 @@ export class RouteComponent implements OnInit, RouteComponentInterface, RouteCol
   onDayCheckboxChange(event: any, routeId:number, routeDayId: number) {
     const isChecked = event.checked;
 
-    let dayRoute = this.routes.filter(d => d.id == routeId)[0]
-          .dayRoutes.filter(d => d.id == routeDayId)[0];
+    let route = this.routes.filter(d => d.id == routeId)[0];
+    let dayRoute = route.dayRoutes.filter(d => d.id == routeDayId)[0];
     
     dayRoute.isChecked = isChecked;
     
@@ -156,6 +156,21 @@ export class RouteComponent implements OnInit, RouteComponentInterface, RouteCol
     else {
       this.routeEventService.sendDayRouteIdForRemove(routeDayId);
     }
+
+    route.isChecked = this.isAllDaysInRouteChecked(route);
+    
+  }
+
+  private isAllDaysInRouteChecked(route: Route): boolean {
+
+      let result = true;
+
+      route.dayRoutes.forEach(dr => {
+        if (!dr.isChecked)
+          result = false;
+      })
+
+      return result;
   }
   
   onRouteCheckboxChange(event: any, routeId:number) {
@@ -240,6 +255,24 @@ export class RouteComponent implements OnInit, RouteComponentInterface, RouteCol
       });
 
       return result;
+  }
+
+  isIndeterminate(route: Route): boolean {
+
+    let result = false;
+    route.dayRoutes.forEach(dr => {
+      if (dr.isChecked)
+        result = true;
+    })
+
+    let isAllDaysChecked = this.isAllDaysInRouteChecked(route);
+
+    if (!isAllDaysChecked)
+      return result;
+
+    route.isChecked = true;
+
+    return false;
   }
 
 }

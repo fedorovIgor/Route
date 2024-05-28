@@ -17,6 +17,8 @@
           <mat-checkbox 
             (click)="$event.stopPropagation()" 
             (change)="onRouteCheckboxChange($event, route.id)"
+            [ngModel] = "route.isChecked"
+            [indeterminate]="isIndeterminate(route)"
             [ngStyle]="{'background-color': !isAllDayRoutesChecked(route) ? 'red' : 'white', 'border-radius': '15px', 'border-width': '1px', 'color': 'red'}"
             class="custom-checkbox"></mat-checkbox
             >
