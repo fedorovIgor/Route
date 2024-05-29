@@ -27,8 +27,8 @@ export interface RouteComponentInterface {
     // по завершению вызывается запрос для обнавления всех route[]
     onCalculateVRPBtn(): void;
 
-    // показавает у всех ли DayRoutes в выбранном Route стоит isChecked == true
-    isAllDayRoutesChecked(route: Route): boolean
+    // показавает у всех ли DayRoutes в выбранном Route стоит description == true
+    isAllDayRoutesHasDescription(route: Route): boolean
 
     // TODO: убирает все отметки как у Route так и у DayRoute
     

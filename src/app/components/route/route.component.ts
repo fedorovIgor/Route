@@ -242,7 +242,7 @@ export class RouteComponent implements OnInit, RouteComponentInterface, RouteCol
     this.routeHttpService.postCalculateVRPByDayIds(visitPoints).subscribe(resp => console.log(resp));
   }
 
-  isAllDayRoutesChecked(route: Route): boolean {
+  isAllDayRoutesHasDescription(route: Route): boolean {
 
     if (!route)
       return false;

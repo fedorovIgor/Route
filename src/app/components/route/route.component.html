@@ -17,11 +17,10 @@
           <mat-checkbox 
             (click)="$event.stopPropagation()" 
             (change)="onRouteCheckboxChange($event, route.id)"
-            [ngModel] = "route.isChecked"
+            [ngClass]="{'with-description': isAllDayRoutesHasDescription(route), 'without-description': !isAllDayRoutesHasDescription(route)}"
+            [checked] = "route.isChecked"
             [indeterminate]="isIndeterminate(route)"
-            [ngStyle]="{'background-color': !isAllDayRoutesChecked(route) ? 'red' : 'white', 'border-radius': '15px', 'border-width': '1px', 'color': 'red'}"
-            class="custom-checkbox"></mat-checkbox
-            >
+            class="custom-checkbox"></mat-checkbox>
           {{ route.routeName }}
         </mat-panel-title>
 
@@ -36,7 +35,7 @@
           <mat-checkbox [labelPosition]="'before'" 
                 [checked]="dayRoute.isChecked" 
                 (change)="onDayCheckboxChange($event, route.id, dayRoute.id)"
-                [ngStyle]="{'background-color': !dayRoute.routeDescription ? 'red' : 'white', 'border-radius': '15px', 'border-width': '1px', 'color': 'red'}"
+                [ngClass]="{'with-description': dayRoute.routeDescription, 'without-description': !dayRoute.routeDescription}"
                 >
           </mat-checkbox> 
             неделя {{ dayRoute.week }}, день {{ dayRoute.dayInWeek }} 
