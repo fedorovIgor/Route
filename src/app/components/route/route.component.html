@@ -38,7 +38,7 @@
                 [ngClass]="{'with-description': dayRoute.routeDescription, 'without-description': !dayRoute.routeDescription}"
                 >
           </mat-checkbox> 
-            неделя {{ dayRoute.week }}, день {{ dayRoute.dayInWeek }} 
+            неделя {{ dayRoute.week }}, {{ dayRoute.dayInWeekRussian }}, длина {{ dayRoute.routeLength }}
             <input type="color" [(ngModel)]="dayRoute.color" >
         </mat-list-item>
       </mat-list>

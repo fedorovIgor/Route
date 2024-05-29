@@ -13,6 +13,7 @@ import { RouteEventService } from '../../services/route-event.service';
 import { Route } from '../../models/Route';
 import { Visit } from '../../models/Visit';
 import { CustomerWarehouse } from '../../models/CustomerWarehouse';
+import { DayRoute } from '../../models/DayRoutes';
 
 @Component({
   selector: 'app-route',
@@ -39,6 +40,37 @@ export class RouteComponent implements OnInit, RouteComponentInterface, RouteCol
     this.fillRoutes();
   }
 
+  // сортирует DayRoutes[] по неделе, а затем по дням недели 
+  private sortRouteDays(dayRoutes: DayRoute[]) {
+
+    const sortByDayAndWeek = (a: DayRoute, b: DayRoute): number => {
+      if (a.week !== b.week) {
+        return a.week - b.week;
+      } else {
+        return a.dayInWeek - b.dayInWeek;
+      }
+    };
+
+    dayRoutes.sort(sortByDayAndWeek)
+  }
+
+
+  private convertDayName(dayRoute: DayRoute) {
+    if (dayRoute.dayInWeek == 1)
+      dayRoute.dayInWeekRussian = 'Пн'
+    if (dayRoute.dayInWeek == 2)
+      dayRoute.dayInWeekRussian = 'Вт'
+    if (dayRoute.dayInWeek == 3)
+      dayRoute.dayInWeekRussian = 'Ср'
+    if (dayRoute.dayInWeek == 4)
+      dayRoute.dayInWeekRussian = 'Чт'
+    if (dayRoute.dayInWeek == 5)
+      dayRoute.dayInWeekRussian = 'Пт'
+    if (dayRoute.dayInWeek == 6)
+      dayRoute.dayInWeekRussian = 'Сб'
+    if (dayRoute.dayInWeek == 7)
+      dayRoute.dayInWeekRussian = 'Вс'
+  }
   
   fillRoutes() {
     this.routeHttpService.getRoutes()
@@ -48,6 +80,14 @@ export class RouteComponent implements OnInit, RouteComponentInterface, RouteCol
           this.getCustomersForVisits();
           this.routeEventService.cleanMap();
           console.log(this.routes);
+
+          resp.forEach(r => {
+            this.sortRouteDays(r.dayRoutes);
+            r.dayRoutes.forEach(d => {
+              this.convertDayName(d);
+            })
+          })
+
         })
   }
 
@@ -138,7 +178,6 @@ export class RouteComponent implements OnInit, RouteComponentInterface, RouteCol
       return hexValue.length === 1 ? "0" + hexValue : hexValue;
     }).join("");
   
-    // Вернуть строку в формате HEX
     return hex;
   }
 

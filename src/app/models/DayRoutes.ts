@@ -16,4 +16,5 @@ export interface DayRoute {
     visits: Visit[];
 
     isChecked: boolean;
+    dayInWeekRussian: string;
   }
