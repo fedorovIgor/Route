@@ -2,7 +2,7 @@
     <button (click)="onCalculatePathBtn()" mat-raised-button>Расчитать выбранные маршруты</button>
   </div>
   <div>
-    <button (click)="onCalculateVRPBtn()" mat-raised-button>Расчитать</button>
+    <button (click)="onCalculateVRPBtn()" mat-raised-button>Упорядочить пути в Route</button>
   </div>     
   <div>
     <button (click)="onDistribute()" mat-raised-button>Распределить визиты</button>
@@ -38,7 +38,7 @@
                 [ngClass]="{'with-description': dayRoute.routeDescription, 'without-description': !dayRoute.routeDescription}"
                 >
           </mat-checkbox> 
-            неделя {{ dayRoute.week }}, {{ dayRoute.dayInWeekRussian }}, длина {{ dayRoute.routeLength }}
+            неделя {{ dayRoute.week }}, {{ dayRoute.dayInWeekRussian }}, растояние {{ dayRoute.routeLength }}
             <input type="color" [(ngModel)]="dayRoute.color" >
         </mat-list-item>
       </mat-list>

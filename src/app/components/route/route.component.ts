@@ -14,6 +14,9 @@ import { Route } from '../../models/Route';
 import { Visit } from '../../models/Visit';
 import { CustomerWarehouse } from '../../models/CustomerWarehouse';
 import { DayRoute } from '../../models/DayRoutes';
+import { MessageService } from '../../services/message.service';
+import { catchError, throwError } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-route',
@@ -33,7 +36,8 @@ export class RouteComponent implements OnInit, RouteComponentInterface, RouteCol
   routes!: Route[];
 
   constructor (private routeHttpService: RoutHttpService,
-    private routeEventService: RouteEventService
+    private routeEventService: RouteEventService,
+    private messageService: MessageService
   ) {}
 
   ngOnInit(): void {
@@ -243,7 +247,25 @@ export class RouteComponent implements OnInit, RouteComponentInterface, RouteCol
         routeId = r.id;
     });
 
-    this.routeHttpService.postDistributeVisitsByRoute(routeId).subscribe(resp => {});
+    this.routeHttpService.postDistributeVisitsByRoute(routeId)
+    .pipe(
+      catchError((error: HttpErrorResponse) => {
+        let errorMessage = 'An unknown error occurred!';
+        if (error.error instanceof ErrorEvent) {
+          // Client-side error
+          errorMessage = `Error: ${error.error.message}`;
+        } else {
+          // Server-side error
+          errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
+        }
+        this.messageService.show(errorMessage, 'Close', 5000);  // Показать сообщение об ошибке
+        return throwError(() => new Error(errorMessage));
+      })
+    )
+      .subscribe(resp => {
+        this.messageService.show("Пути распределены");
+
+      });
   }
   
   onCalculatePathBtn(): void {
@@ -264,6 +286,7 @@ export class RouteComponent implements OnInit, RouteComponentInterface, RouteCol
     this.routeHttpService.postCalculateForDays(dayIds).subscribe(resp => {
       this.routes = [];
       this.fillRoutes(); 
+      this.messageService.show("Пути построенны");
     });
   }
   
@@ -278,7 +301,11 @@ export class RouteComponent implements OnInit, RouteComponentInterface, RouteCol
       })
     })
 
-    this.routeHttpService.postCalculateVRPByDayIds(visitPoints).subscribe(resp => console.log(resp));
+    this.routeHttpService.postCalculateVRPByDayIds(visitPoints)
+      .subscribe(resp => {
+        this.messageService.show("Пути упорядочены")
+        console.log(resp)
+      });
   }
 
   isAllDayRoutesHasDescription(route: Route): boolean {
