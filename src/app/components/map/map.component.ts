@@ -33,6 +33,11 @@ import { XYZ } from 'ol/source';
 import VectorLayer from 'ol/layer/Vector';
 import { MapComponentInterface } from './MapComponentInterface';
 import { RouteEventService } from '../../services/route-event.service';
+import {Draw, Modify} from 'ol/interaction';
+import { SelectEvent } from 'ol/interaction/Select';
+import Collection from 'ol/Collection';
+import { unByKey } from 'ol/Observable';
+import { getLength } from 'ol/sphere';
 
 
 @Component({
@@ -51,6 +56,16 @@ export class MapComponent implements AfterViewInit, MapComponentInterface {
   private vectorSource: VectorSource = new VectorSource();
   private circleSource: VectorSource = new VectorSource();
   private textLayer: VectorSource = new VectorSource();
+  private measureLayer: VectorSource = new VectorSource() ;
+  private draw: Draw = new Draw({
+    source: this.measureLayer,
+    type: 'LineString',
+  });
+
+  private mesuareEvent: any;
+  private measureOverlay!: Overlay;
+  private measureElement: any;
+  private drawnLine!: LineString;
 
   private currantPoint!: Feature<Geometry>;
 
@@ -76,6 +91,16 @@ export class MapComponent implements AfterViewInit, MapComponentInterface {
         new VectorLayer({source: this.vectorSource}),
         new VectorLayer({source: this.circleSource}),
         new VectorLayer({source: this.textLayer}),
+        new VectorLayer({
+          source: this.measureLayer,
+          style: new Style({
+            stroke: new Stroke({
+              color: 'rgba(255, 0, 0, 1.0)',
+              width: 2
+            })
+          }),
+          
+        })
       ],
 
       view: new View({
@@ -86,6 +111,16 @@ export class MapComponent implements AfterViewInit, MapComponentInterface {
 
     this.addMapListeners();
     this.eventSubscriber();
+
+    // Позволяет изменять нарисованную линию
+    // this.map.addInteraction(new Modify({source: this.measureLayer}));
+
+    this.map.addInteraction(this.draw);
+
+    this.toggleMeasure();
+
+    this.configDraw();
+
   }
 
 
@@ -114,7 +149,7 @@ export class MapComponent implements AfterViewInit, MapComponentInterface {
     // Также меняется отображение точки на карте - меняется ее размер и контур
     this.map.on("click", (e) => {
       e.map.forEachFeatureAtPixel(e.pixel, (feature, layer) => {
-        if (feature && layer.getSource() == this.circleSource){
+        if (feature && layer && layer.getSource() == this.circleSource){
           let visit = feature.get('visit') as Visit;
           this.changePointFormToSelected(visit.id);
 
@@ -133,7 +168,7 @@ export class MapComponent implements AfterViewInit, MapComponentInterface {
     // Отображает информацию о точке при наведении на нее
     // с помощью добавления текстовой feature 
     // должен отображаться толко один текстовый блок единовременно
-    // TODO: исправить мерцания при наведении на несколько точек
+    // TODO: исправить мерцания при наведении на несколько точек (возможно использовать кластеризацию точек)
     this.map.on("pointermove", (e) => {
       const pixel = this.map.getEventPixel(e.originalEvent);
       const hit = this.map.hasFeatureAtPixel(pixel); // Проверяем, есть ли объекты на данном пикселе
@@ -146,7 +181,7 @@ export class MapComponent implements AfterViewInit, MapComponentInterface {
 
       e.map.forEachFeatureAtPixel(e.pixel, (feature, layer) => {
 
-        if (choosenFeatureCircle != feature && layer.getSource() == this.circleSource) {
+        if (choosenFeatureCircle != feature && layer && layer.getSource() == this.circleSource) {
           choosenFeatureCircle = feature;
           let olFeature = feature as Feature<Point>;
             let coordinates = olFeature.getGeometry()?.getCoordinates();
@@ -184,7 +219,60 @@ export class MapComponent implements AfterViewInit, MapComponentInterface {
             this.textLayer.addFeature(textFeature);
         }
       })
+
     })
+  }
+
+  createOverlay(): void {
+    
+    this.measureElement = document.createElement('div');
+    this.measureElement.className = 'ol-tooltip ol-tooltip-measure';
+
+    // Создаем Overlay
+    this.measureOverlay = new Overlay({
+      element: this.measureElement,
+      positioning: 'bottom-center',
+      stopEvent: false,
+      offset: [0, -15],
+    });
+
+    // Добавляем Overlay на карту
+    this.map.addOverlay(this.measureOverlay);
+
+    // Устанавливаем позицию Overlay по клику на карту
+    this.mesuareEvent = this.map.on('click', (evt) => {
+      
+      if (!this.drawnLine)
+        return;
+
+      const length = getLength(this.drawnLine);
+      this.measureElement.innerHTML = length;
+
+      this.measureOverlay.setPosition(evt.coordinate);
+    });
+  }
+
+  configDraw() {
+
+  
+    this.draw.on('drawstart', (evt) => {
+      this.drawnLine = evt.feature.getGeometry() as LineString;
+      
+      this.createOverlay();
+    });
+
+    
+
+    this.draw.on('drawend', (evt) => {
+      const line = evt.feature.getGeometry() as LineString;
+      const length = getLength(line);
+      this.measureElement.innerHTML = length;
+      // Отписываемся от эвента
+      if (this.mesuareEvent) {
+        unByKey(this.mesuareEvent);
+        this.mesuareEvent = null;
+      }
+    });
   }
 
   printLine(dayRoute: DayRoute) {
@@ -346,7 +434,16 @@ export class MapComponent implements AfterViewInit, MapComponentInterface {
     this.featureMap.forEach((value, key) => {
       this.removeLine(key);
     })
+
+    this.measureLayer.clear()
   }
 
+  toggleMeasure() {
+    
+    const interactions = this.map.getInteractions().getArray();
+    const drawInteraction = interactions.find(interaction => interaction === this.draw);
+    
+    drawInteraction?.setActive(!drawInteraction?.getActive());
+  }
 
 }

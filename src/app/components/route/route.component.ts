@@ -258,12 +258,12 @@ export class RouteComponent implements OnInit, RouteComponentInterface, RouteCol
           // Server-side error
           errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
         }
-        this.messageService.show(errorMessage, 'Close', 5000);  // Показать сообщение об ошибке
+        this.messageService.show(errorMessage, 'Close', 5000);
         return throwError(() => new Error(errorMessage));
       })
     )
       .subscribe(resp => {
-        this.messageService.show("Пути распределены");
+        this.messageService.show("Визиты распределены");
 
       });
   }
