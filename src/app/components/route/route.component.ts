@@ -283,10 +283,11 @@ export class RouteComponent implements OnInit, RouteComponentInterface, RouteCol
 
     console.log(dayIds);
 
-    this.routeHttpService.postCalculateForDays(dayIds).subscribe(resp => {
-      this.routes = [];
-      this.fillRoutes(); 
-      this.messageService.show("Пути построенны");
+    this.routeHttpService.postCalculateForDays(dayIds)
+      .subscribe(resp => {
+        this.routes = [];
+        this.fillRoutes(); 
+        this.messageService.show("Пути построенны");
     });
   }
   

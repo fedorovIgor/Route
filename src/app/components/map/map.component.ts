@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { Feature, MapBrowserEvent, Overlay } from 'ol';
 import {Map as OlMap} from 'ol';
 import View from 'ol/View';
@@ -74,7 +74,8 @@ export class MapComponent implements AfterViewInit, MapComponentInterface {
   private circleMap: Map<number, Feature[]> = new Map<number, Feature[]>;
 
   constructor (
-    private routeEventService: RouteEventService
+    private routeEventService: RouteEventService,
+    private renderer: Renderer2, private el: ElementRef
   ) {}
 
   ngAfterViewInit(): void {
@@ -224,8 +225,9 @@ export class MapComponent implements AfterViewInit, MapComponentInterface {
   }
 
   createOverlay(): void {
-    
-    this.measureElement = document.createElement('div');
+
+    let element = document.createElement('div');
+    this.measureElement = element
     this.measureElement.className = 'ol-tooltip ol-tooltip-measure';
 
     // Создаем Overlay
@@ -435,7 +437,14 @@ export class MapComponent implements AfterViewInit, MapComponentInterface {
       this.removeLine(key);
     })
 
+    // удаление линеек
     this.measureLayer.clear()
+
+    // очистка HTML элементов(расстояний) с карты
+    const tooltips = this.el.nativeElement.querySelectorAll('.ol-tooltip.ol-tooltip-measure');
+    tooltips.forEach((tooltip: HTMLElement) => {
+      this.renderer.removeChild(tooltip.parentNode, tooltip);
+    });
   }
 
   toggleMeasure() {
