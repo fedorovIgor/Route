@@ -229,6 +229,7 @@ export class MapComponent implements AfterViewInit, MapComponentInterface {
     let element = document.createElement('div');
     this.measureElement = element
     this.measureElement.className = 'ol-tooltip ol-tooltip-measure';
+    this.measureElement.style.backgroundColor = 'yellow';
 
     // Создаем Overlay
     this.measureOverlay = new Overlay({
@@ -248,7 +249,8 @@ export class MapComponent implements AfterViewInit, MapComponentInterface {
         return;
 
       const length = getLength(this.drawnLine);
-      this.measureElement.innerHTML = length;
+      const roundedNum = Math.round(length); 
+      this.measureElement.innerHTML = roundedNum + ' м';
 
       this.measureOverlay.setPosition(evt.coordinate);
     });
@@ -268,7 +270,8 @@ export class MapComponent implements AfterViewInit, MapComponentInterface {
     this.draw.on('drawend', (evt) => {
       const line = evt.feature.getGeometry() as LineString;
       const length = getLength(line);
-      this.measureElement.innerHTML = length;
+      const roundedNum = Math.round(length); 
+      this.measureElement.innerHTML = roundedNum + ' м';
       // Отписываемся от эвента
       if (this.mesuareEvent) {
         unByKey(this.mesuareEvent);
