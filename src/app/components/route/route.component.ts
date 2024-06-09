@@ -89,6 +89,7 @@ export class RouteComponent implements OnInit, RouteComponentInterface, RouteCol
             this.sortRouteDays(r.dayRoutes);
             r.dayRoutes.forEach(d => {
               this.convertDayName(d);
+              d.routeId = r.id;
             })
           })
 

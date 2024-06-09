@@ -1,11 +1,7 @@
 <ul>
     <li *ngFor="let day of days">
       <ul>
-        <!-- <li *ngFor="let visit of day.visits" 
-        [ngClass]="{'highlighted': visit === selectedVisit}"
-        (click)="onVisit(visit)" >
-          {{ visit.id }}
-        </li> -->
+        маршрут: {{day.routeId}}
         <div>
           <mat-table #table [dataSource]="day.visits">
         
