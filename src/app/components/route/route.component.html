@@ -39,7 +39,9 @@
                 >
           </mat-checkbox> 
             неделя {{ dayRoute.week }}, {{ dayRoute.dayInWeekRussian }}, растояние {{ dayRoute.routeLength }}
-            <input type="color" [(ngModel)]="dayRoute.color" >
+            <input type="color" 
+                [(ngModel)]="dayRoute.color"  
+                (input)="onColorChange($event, dayRoute)">
         </mat-list-item>
       </mat-list>
       

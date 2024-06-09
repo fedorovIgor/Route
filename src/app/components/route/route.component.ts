@@ -95,6 +95,16 @@ export class RouteComponent implements OnInit, RouteComponentInterface, RouteCol
         })
   }
 
+  // отработка эвента на смену цвета
+  onColorChange(event: any, dayRoute: DayRoute){
+    const newColor = event.target.value;
+    console.log('Цвет изменился на:', newColor);
+
+    dayRoute.color = newColor;
+
+    this.routeEventService.changeColor(dayRoute);
+  }
+
   // выбираются id точек и запрашиваются с сервера
   // затем сопоставляются с текущими Route[] 
   private getCustomersForVisits() {

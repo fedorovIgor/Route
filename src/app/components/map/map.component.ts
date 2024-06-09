@@ -141,6 +141,10 @@ export class MapComponent implements AfterViewInit, MapComponentInterface {
     this.routeEventService.selectedVisit().subscribe(visit => {
       this.changePointFormToSelected(visit.id);
     })
+
+    this.routeEventService.redrowRoute().subscribe(dayRoute => {
+      this.redrowRouetDay(dayRoute);
+    })
   }
 
 
@@ -278,6 +282,43 @@ export class MapComponent implements AfterViewInit, MapComponentInterface {
         this.mesuareEvent = null;
       }
     });
+  }
+
+  redrowRouetDay(dayRoute: DayRoute) {
+    if (!this.featureMap.has(dayRoute.id))
+      return;
+
+    let line = this.featureMap.get(dayRoute.id)
+    if (!line)
+      return;
+
+    let lineStile = line.getStyle() as Style;
+    if (!lineStile)
+      return;
+
+    lineStile.getStroke()?.setColor(dayRoute.color);
+    line.setStyle(lineStile);
+
+    let circles = this.circleMap.get(dayRoute.id);
+    if (!circles)
+      return;
+
+    circles.forEach(c => {
+      let circleStyle = c.getStyle() as Style;
+      if (!circleStyle)
+        return;
+  
+      let currentImage = circleStyle.getImage() as CircleStyle;
+      if (!currentImage) 
+        return;
+      
+      let stroke = currentImage.getStroke();
+      stroke?.setColor(dayRoute.color);
+  
+      currentImage.setStroke(stroke);
+      c.setStyle(circleStyle);
+    })
+
   }
 
   printLine(dayRoute: DayRoute) {

@@ -15,6 +15,7 @@ export class RouteEventService {
   cleanMapEvent = new EventEmitter<void>();
 
   private visitSelectedOnMap = new Subject<Visit>();
+  private changedColor = new Subject<DayRoute>();
 
 
   sendDayRouteForPrint(dayRoute: DayRoute) {
@@ -43,6 +44,14 @@ export class RouteEventService {
 
   selectedVisit() {
     return this.visitSelectedOnMap.asObservable();
+  }
+
+  changeColor(dayRoute: DayRoute) {
+    this.changedColor.next(dayRoute);
+  }
+
+  redrowRoute() {
+    return this.changedColor.asObservable();
   }
 
 }
