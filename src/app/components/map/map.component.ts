@@ -312,10 +312,10 @@ export class MapComponent implements AfterViewInit, MapComponentInterface {
       if (!currentImage) 
         return;
       
-      let stroke = currentImage.getStroke();
-      stroke?.setColor(dayRoute.color);
+      let fill = currentImage.getFill();
+      fill?.setColor(dayRoute.color);
   
-      currentImage.setStroke(stroke);
+      currentImage.setFill(fill);
       c.setStyle(circleStyle);
     })
 
