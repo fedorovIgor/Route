@@ -1,4 +1,21 @@
-#map {
+
+body, html {
+  margin: 0;
+  padding: 0;
   height: 100%;
 }
 
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.buttons {
+  flex: none; /* Кнопки не растягиваются */
+}
+
+#map {
+  flex-grow: 1; /* Карта занимает оставшееся пространство */
+  width: 100%;
+}
